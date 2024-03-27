@@ -1,0 +1,24 @@
+try {
+    # Get a list of all PnP devices and output to the console
+    Write-Output "Listing all PnP devices..."
+    Get-PnpDevice | Out-String | Write-Output
+
+    # Find and list Media devices specifically, displaying friendly name, status, and instance ID
+    Write-Output "Listing all Media class devices..."
+    $mediaDevices = Get-PnpDevice -Class 'media' | Select-Object FriendlyName, Status, InstanceId
+    $mediaDevices | Out-String | Write-Output
+
+    # Specify the instance ID of the device to disable
+    $uninstallDriver = "ROOT\STEAMSTREAMINGSPEAKERS\0000"
+    
+    # Disable the specified device
+    Write-Output "Disabling the device with Instance ID: $uninstallDriver"
+    Get-PnpDevice -InstanceId $uninstallDriver | Disable-PnpDevice -Confirm:$false
+
+    # Scans for hardware changes using pnputil.exe
+    Write-Output "Scanning for hardware changes..."
+    & pnputil.exe /scan-devices
+}
+catch {
+    Write-Error "An error occurred: $_"
+}
